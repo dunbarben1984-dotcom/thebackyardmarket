@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard — The Backyard Market</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --green-dark:#1F3B2C; --green:#2F5541; --green-pale:#E4EBDF;
+    --gold:#D4A24C; --gold-deep:#B27F2E; --cream:#F7F2E6; --paper:#FCFAF4;
+    --ink:#241C15; --ink-soft:#5B5245; --rust:#B8481F; --line:#DCD3BE; --radius:3px;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--cream);color:var(--ink);font-family:'Work Sans',sans-serif;line-height:1.5;}
+  h1,h2,h3{font-family:'Fraunces',serif;font-weight:600;margin:0;letter-spacing:-0.01em;}
+  .wrap{max-width:960px;margin:0 auto;padding:0 24px;}
+  a{color:inherit;}
+  button,input,select{font-family:inherit;}
+  .btn{display:inline-block;padding:10px 18px;border-radius:var(--radius);font-weight:600;font-size:0.9rem;border:1px solid transparent;cursor:pointer;}
+  .btn-primary{background:var(--green-dark);color:var(--paper);}
+  .btn-primary:hover{background:var(--green);}
+  .btn-outline{background:transparent;border-color:var(--green-dark);color:var(--green-dark);}
+  .btn-gold{background:var(--gold);color:var(--ink);}
+  .btn-danger{background:transparent;border-color:var(--rust);color:var(--rust);}
+  .btn-small{padding:7px 12px;font-size:0.82rem;}
+
+  header{background:var(--paper);border-bottom:1px solid var(--line);padding:16px 0;}
+  .nav{display:flex;justify-content:space-between;align-items:center;}
+  .logo{font-family:'Fraunces',serif;font-weight:700;font-size:1.2rem;color:var(--green-dark);}
+
+  main{padding:40px 0 80px;}
+  .banner{padding:14px 18px;border-radius:var(--radius);margin-bottom:28px;font-size:0.9rem;}
+  .banner.warn{background:#FBEADD;color:var(--rust);border:1px solid #EBC9AA;}
+  .banner.ok{background:var(--green-pale);color:var(--green-dark);border:1px solid #C7D6BE;}
+
+  .panel{background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:26px;margin-bottom:24px;}
+  .panel h2{font-size:1.3rem;color:var(--green-dark);margin-bottom:16px;}
+  .row{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;}
+
+  .field{margin-bottom:14px;}
+  .field label{display:block;font-size:0.84rem;font-weight:600;margin-bottom:6px;}
+  .field input,.field select{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:var(--radius);background:var(--cream);font-size:0.92rem;}
+  .field-inline{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+
+  table{width:100%;border-collapse:collapse;margin-top:8px;}
+  th,td{text-align:left;padding:10px 8px;border-bottom:1px solid var(--line);font-size:0.88rem;}
+  th{color:var(--ink-soft);font-weight:600;font-size:0.78rem;text-transform:uppercase;letter-spacing:0.03em;}
+  .status-pill{padding:3px 10px;border-radius:12px;font-size:0.74rem;font-weight:700;}
+  .status-available{background:var(--green-pale);color:var(--green-dark);}
+  .status-pre_order{background:#FBF1D8;color:var(--gold-deep);}
+  .status-sold_out{background:#F3E1DC;color:var(--rust);}
+
+  #authScreen{max-width:420px;margin:60px auto;}
+  .tabs{display:flex;gap:8px;margin-bottom:20px;}
+  .tab{flex:1;padding:10px;text-align:center;border:1px solid var(--line);border-radius:var(--radius);font-weight:600;font-size:0.88rem;cursor:pointer;background:var(--paper);}
+  .tab.active{background:var(--green-dark);color:var(--paper);border-color:var(--green-dark);}
+  .msg{font-size:0.85rem;margin-top:10px;}
+  .msg.error{color:var(--rust);}
+  .msg.success{color:var(--green-dark);}
+  #app{display:none;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap nav">
+    <div class="logo">The Backyard Market — Dashboard</div>
+    <div><button class="btn btn-outline btn-small" onclick="logout()">Sign out</button></div>
+  </div>
+</header>
+
+<!-- LOGIN / SIGNUP -->
+<div id="authScreen" class="wrap">
+  <div class="panel">
+    <div class="tabs">
+      <div class="tab active" id="tabLogin" onclick="switchTab('login')">Sign in</div>
+      <div class="tab" id="tabSignup" onclick="switchTab('signup')">Create account</div>
+    </div>
+
+    <div id="loginForm">
+      <div class="field"><label>Email</label><input id="loginEmail" type="email"></div>
+      <div class="field"><label>Password</label><input id="loginPassword" type="password"></div>
+      <button class="btn btn-primary" style="width:100%;" onclick="login()">Sign in</button>
+      <div class="msg error" id="loginMsg"></div>
+    </div>
+
+    <div id="signupForm" style="display:none;">
+      <div class="field"><label>Full name</label><input id="suName" type="text"></div>
+      <div class="field"><label>Email</label><input id="suEmail" type="email"></div>
+      <div class="field"><label>Password</label><input id="suPassword" type="password"></div>
+      <div class="field field-inline">
+        <div><label>I am a…</label>
+          <select id="suRole" onchange="toggleFarmField()">
+            <option value="farmer">Farmer</option>
+            <option value="buyer">Buyer</option>
+          </select>
+        </div>
+        <div><label>ZIP code</label><input id="suZip" type="text"></div>
+      </div>
+      <div class="field" id="suFarmField"><label>Farm name</label><input id="suFarmName" type="text"></div>
+      <button class="btn btn-primary" style="width:100%;" onclick="signup()">Create account</button>
+      <div class="msg error" id="signupMsg"></div>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="app">
+  <main class="wrap">
+    <div id="subBanner"></div>
+
+    <div class="panel" id="billingPanel">
+      <div class="row">
+        <div>
+          <h2>Billing</h2>
+          <p id="billingStatus" style="color:var(--ink-soft);font-size:0.9rem;margin-top:4px;"></p>
+        </div>
+        <div id="billingActions"></div>
+      </div>
+    </div>
+
+    <div class="panel" id="listingsPanel" style="display:none;">
+      <div class="row" style="margin-bottom:6px;">
+        <h2>Your listings</h2>
+        <button class="btn btn-gold btn-small" onclick="openNewListingForm()">+ Add listing</button>
+      </div>
+
+      <div id="newListingForm" style="display:none;margin:16px 0;padding:16px;background:var(--cream);border-radius:var(--radius);border:1px solid var(--line);">
+        <div class="field-inline field">
+          <div><label>Item name</label><input id="lName" type="text" placeholder="Heirloom Tomatoes"></div>
+          <div><label>Category</label>
+            <select id="lCategory">
+              <option>Vegetables</option><option>Fruits</option><option>Beef & Meat</option>
+              <option>Poultry & Eggs</option><option>Dairy</option><option>Herbs</option><option>Honey & Preserves</option>
+            </select>
+          </div>
+        </div>
+        <div class="field-inline field">
+          <div><label>Price (USD)</label><input id="lPrice" type="number" step="0.01" placeholder="4.50"></div>
+          <div><label>Unit</label><input id="lUnit" type="text" placeholder="lb / dozen / bunch"></div>
+        </div>
+        <div class="field"><label><input type="checkbox" id="lOrganic" style="width:auto;margin-right:6px;">Organic / certified</label></div>
+        <div class="field"><label>Description (optional)</label><input id="lDescription" type="text"></div>
+        <button class="btn btn-primary btn-small" onclick="createListing()">Save listing</button>
+        <button class="btn btn-outline btn-small" onclick="closeNewListingForm()">Cancel</button>
+        <div class="msg error" id="listingMsg"></div>
+      </div>
+
+      <table id="listingsTable">
+        <thead><tr><th>Item</th><th>Category</th><th>Price</th><th>Status</th><th></th></tr></thead>
+        <tbody id="listingsBody"></tbody>
+      </table>
+      <p id="noListings" style="color:var(--ink-soft);font-size:0.88rem;display:none;">No listings yet — add your first one above.</p>
+    </div>
+  </main>
+</div>
+
+<script>
+  // Point this at your deployed API. During local dev this is usually http://localhost:4242.
+  const API_BASE = window.location.origin.includes('localhost') ? 'http://localhost:4242' : '';
+
+  let token = localStorage.getItem('ff_token');
+  let currentUser = JSON.parse(localStorage.getItem('ff_user') || 'null');
+
+  function switchTab(tab){
+    document.getElementById('tabLogin').classList.toggle('active', tab==='login');
+    document.getElementById('tabSignup').classList.toggle('active', tab==='signup');
+    document.getElementById('loginForm').style.display = tab==='login' ? 'block' : 'none';
+    document.getElementById('signupForm').style.display = tab==='signup' ? 'block' : 'none';
+  }
+  function toggleFarmField(){
+    document.getElementById('suFarmField').style.display =
+      document.getElementById('suRole').value === 'farmer' ? 'block' : 'none';
+  }
+
+  async function api(path, options = {}){
+    const res = await fetch(`${API_BASE}/api${path}`, {
+      ...options,
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...(options.headers || {}),
+      },
+      body: options.body ? JSON.stringify(options.body) : undefined,
+    });
+    const data = await res.json().catch(() => ({}));
+    if(!res.ok) throw new Error(data.error || 'Something went wrong.');
+    return data;
+  }
+
+  async function login(){
+    const email = document.getElementById('loginEmail').value;
+    const password = document.getElementById('loginPassword').value;
+    try{
+      const data = await api('/auth/login', { method:'POST', body:{ email, password } });
+      saveSession(data);
+    }catch(err){
+      document.getElementById('loginMsg').textContent = err.message;
+    }
+  }
+
+  async function signup(){
+    const body = {
+      fullName: document.getElementById('suName').value,
+      email: document.getElementById('suEmail').value,
+      password: document.getElementById('suPassword').value,
+      role: document.getElementById('suRole').value,
+      zipCode: document.getElementById('suZip').value,
+      farmName: document.getElementById('suFarmName').value,
+    };
+    try{
+      const data = await api('/auth/signup', { method:'POST', body });
+      saveSession(data);
+    }catch(err){
+      document.getElementById('signupMsg').textContent = err.message;
+    }
+  }
+
+  function saveSession(data){
+    token = data.token; currentUser = data.user;
+    localStorage.setItem('ff_token', token);
+    localStorage.setItem('ff_user', JSON.stringify(currentUser));
+    boot();
+  }
+  function logout(){
+    localStorage.removeItem('ff_token'); localStorage.removeItem('ff_user');
+    token = null; currentUser = null;
+    document.getElementById('app').style.display = 'none';
+    document.getElementById('authScreen').style.display = 'block';
+  }
+
+  async function boot(){
+    if(!token || !currentUser) return;
+    document.getElementById('authScreen').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    await loadBilling();
+    if(currentUser.role === 'farmer'){
+      document.getElementById('listingsPanel').style.display = 'block';
+      await loadListings();
+    }
+  }
+
+  async function loadBilling(){
+    // In a full build this hits GET /api/billing/status; shown here inline via a lightweight
+    // convention — subscription state also arrives via the JWT refresh after checkout.
+    const planLabel = currentUser.role === 'farmer' ? 'Farmer listing — $29.99/yr' : 'Buyer membership — $9.99/yr';
+    document.getElementById('billingStatus').textContent = `Plan: ${planLabel}`;
+    const actions = document.getElementById('billingActions');
+    actions.innerHTML = `
+      <button class="btn btn-gold btn-small" onclick="startCheckout()">Set up / update payment</button>
+      <button class="btn btn-outline btn-small" onclick="openPortal()">Manage billing</button>
+    `;
+  }
+
+  async function startCheckout(){
+    try{
+      const data = await api('/billing/create-checkout-session', { method:'POST' });
+      window.location.href = data.url; // redirects to Stripe's hosted Checkout page
+    }catch(err){ alert(err.message); }
+  }
+  async function openPortal(){
+    try{
+      const data = await api('/billing/portal', { method:'POST' });
+      window.location.href = data.url;
+    }catch(err){ alert(err.message); }
+  }
+
+  function openNewListingForm(){ document.getElementById('newListingForm').style.display = 'block'; }
+  function closeNewListingForm(){ document.getElementById('newListingForm').style.display = 'none'; }
+
+  async function loadListings(){
+    try{
+      const listings = await api('/listings/mine/all');
+      const body = document.getElementById('listingsBody');
+      document.getElementById('noListings').style.display = listings.length ? 'none' : 'block';
+      body.innerHTML = listings.map(l => `
+        <tr>
+          <td>${l.name}${l.organic ? ' 🌱' : ''}</td>
+          <td>${l.category}</td>
+          <td>$${(l.price_cents/100).toFixed(2)} / ${l.unit}</td>
+          <td><span class="status-pill status-${l.status}">${l.status.replace('_',' ')}</span></td>
+          <td>
+            <button class="btn btn-outline btn-small" onclick="cycleStatus('${l.id}','${l.status}')">Update status</button>
+            <button class="btn btn-danger btn-small" onclick="deleteListing('${l.id}')">Delete</button>
+          </td>
+        </tr>
+      `).join('');
+    }catch(err){
+      console.error(err);
+    }
+  }
+
+  async function createListing(){
+    const body = {
+      name: document.getElementById('lName').value,
+      category: document.getElementById('lCategory').value,
+      organic: document.getElementById('lOrganic').checked,
+      priceCents: Math.round(parseFloat(document.getElementById('lPrice').value || '0') * 100),
+      unit: document.getElementById('lUnit').value,
+      description: document.getElementById('lDescription').value,
+    };
+    try{
+      await api('/listings', { method:'POST', body });
+      closeNewListingForm();
+      await loadListings();
+    }catch(err){
+      document.getElementById('listingMsg').textContent = err.message;
+    }
+  }
+
+  async function cycleStatus(id, current){
+    const order = ['available','pre_order','sold_out'];
+    const next = order[(order.indexOf(current)+1) % order.length];
+    try{ await api(`/listings/${id}`, { method:'PUT', body:{ status: next } }); await loadListings(); }
+    catch(err){ alert(err.message); }
+  }
+
+  async function deleteListing(id){
+    if(!confirm('Delete this listing?')) return;
+    try{ await api(`/listings/${id}`, { method:'DELETE' }); await loadListings(); }
+    catch(err){ alert(err.message); }
+  }
+
+  boot();
+</script>
+</body>
+</html>

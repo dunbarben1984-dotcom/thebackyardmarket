@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Backyard Market — Buy fresh food straight from local farms</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --green-dark:#1F3B2C;
+    --green:#2F5541;
+    --green-pale:#E4EBDF;
+    --gold:#D4A24C;
+    --gold-deep:#B27F2E;
+    --cream:#F7F2E6;
+    --paper:#FCFAF4;
+    --ink:#241C15;
+    --ink-soft:#5B5245;
+    --rust:#B8481F;
+    --line:#DCD3BE;
+    --radius:3px;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--cream);
+    color:var(--ink);
+    font-family:'Work Sans',sans-serif;
+    font-size:16px;
+    line-height:1.5;
+  }
+  h1,h2,h3,.display{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    line-height:1.08;
+    margin:0;
+    letter-spacing:-0.01em;
+  }
+  a{color:inherit;}
+  img{max-width:100%;display:block;}
+  button{font-family:inherit;cursor:pointer;}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 28px;}
+
+  /* focus visibility */
+  a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{
+    outline:2px solid var(--gold-deep);outline-offset:2px;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation:none !important;transition:none !important;}
+  }
+
+  /* ---------- HEADER ---------- */
+  header{
+    position:sticky;top:0;z-index:50;
+    background:var(--paper);
+    border-bottom:1px solid var(--line);
+  }
+  .nav{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:16px 28px;max-width:1180px;margin:0 auto;
+  }
+  .logo{
+    display:flex;align-items:center;gap:10px;
+    font-family:'Fraunces',serif;font-weight:700;font-size:1.35rem;
+    color:var(--green-dark);
+  }
+  .logo svg{flex:none;}
+  .nav-links{display:flex;gap:28px;align-items:center;}
+  .nav-links a{
+    text-decoration:none;font-size:0.95rem;font-weight:500;color:var(--ink-soft);
+    padding:6px 2px;border-bottom:2px solid transparent;
+  }
+  .nav-links a:hover{color:var(--green-dark);border-color:var(--gold);}
+  .nav-ctas{display:flex;gap:10px;}
+  .btn{
+    display:inline-block;padding:11px 20px;border-radius:var(--radius);
+    font-weight:600;font-size:0.92rem;border:1px solid transparent;text-decoration:none;
+  }
+  .btn-primary{background:var(--green-dark);color:var(--paper);}
+  .btn-primary:hover{background:var(--green);}
+  .btn-outline{background:transparent;border-color:var(--green-dark);color:var(--green-dark);}
+  .btn-outline:hover{background:var(--green-pale);}
+  .btn-gold{background:var(--gold);color:var(--ink);}
+  .btn-gold:hover{background:var(--gold-deep);color:var(--paper);}
+  .btn-small{padding:8px 14px;font-size:0.85rem;}
+  .btn-block{width:100%;text-align:center;}
+
+  /* ---------- HERO ---------- */
+  .hero{
+    background:var(--green-dark);
+    color:var(--cream);
+    padding:72px 0 64px;
+    position:relative;
+    overflow:hidden;
+  }
+  .hero-grid{
+    display:grid;grid-template-columns:1.1fr 0.9fr;gap:48px;align-items:center;
+  }
+  .hero-eyebrow{
+    color:var(--gold);font-weight:600;font-size:0.9rem;margin-bottom:14px;
+  }
+  .hero h1{font-size:3.2rem;color:var(--paper);max-width:11ch;}
+  .hero p{color:#D8DFCF;font-size:1.1rem;max-width:46ch;margin-top:20px;}
+  .hero-ctas{display:flex;gap:12px;margin-top:32px;flex-wrap:wrap;}
+  .hero-stats{display:flex;gap:32px;margin-top:44px;}
+  .hero-stat b{display:block;font-family:'Fraunces',serif;font-size:1.6rem;color:var(--gold);}
+  .hero-stat span{font-size:0.85rem;color:#B9C4AC;}
+
+  .board{
+    background:var(--paper);border:1px solid var(--line);border-radius:6px;
+    padding:20px;box-shadow:0 24px 60px rgba(0,0,0,0.35);
+    transform:rotate(1.2deg);
+  }
+  .board-head{
+    display:flex;justify-content:space-between;align-items:baseline;
+    border-bottom:2px solid var(--ink);padding-bottom:10px;margin-bottom:14px;
+  }
+  .board-head b{font-family:'Fraunces',serif;font-size:1.05rem;color:var(--ink);}
+  .board-head span{font-size:0.78rem;color:var(--rust);font-weight:600;}
+  .board-row{
+    display:flex;justify-content:space-between;padding:9px 0;
+    border-bottom:1px dashed var(--line);color:var(--ink);font-size:0.92rem;
+  }
+  .board-row:last-child{border-bottom:none;}
+  .board-row .item{font-weight:600;}
+  .board-row .tag{color:var(--ink-soft);font-size:0.78rem;display:block;}
+  .board-row .price{font-family:'Fraunces',serif;color:var(--green-dark);font-weight:600;}
+
+  /* ---------- SECTION HEADERS ---------- */
+  section{padding:64px 0;}
+  .section-head{
+    display:flex;justify-content:space-between;align-items:flex-end;
+    margin-bottom:32px;gap:20px;flex-wrap:wrap;
+  }
+  .section-head h2{font-size:2rem;color:var(--green-dark);}
+  .section-head p{color:var(--ink-soft);margin-top:8px;max-width:52ch;}
+
+  /* ---------- CATEGORY CHIPS ---------- */
+  .chip-row{
+    display:flex;gap:10px;overflow-x:auto;padding-bottom:6px;margin-bottom:36px;
+    scrollbar-width:thin;
+  }
+  .chip{
+    flex:none;padding:9px 18px;border-radius:20px;border:1px solid var(--line);
+    background:var(--paper);font-size:0.88rem;font-weight:600;color:var(--ink-soft);
+    white-space:nowrap;
+  }
+  .chip.active,.chip:hover{background:var(--green-dark);color:var(--paper);border-color:var(--green-dark);}
+
+  /* ---------- LISTINGS ---------- */
+  .listing-grid{
+    display:grid;grid-template-columns:repeat(auto-fill,minmax(258px,1fr));gap:22px;
+  }
+  .card{
+    background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);
+    overflow:hidden;display:flex;flex-direction:column;
+  }
+  .card-photo{
+    height:140px;display:flex;align-items:center;justify-content:center;
+    font-size:2.6rem;color:var(--paper);position:relative;
+  }
+  .card-badge{
+    position:absolute;top:10px;left:10px;background:rgba(252,250,244,0.92);
+    color:var(--green-dark);font-size:0.72rem;font-weight:700;padding:4px 9px;border-radius:12px;
+  }
+  .card-body{padding:16px;display:flex;flex-direction:column;gap:8px;flex:1;}
+  .card-body h3{font-size:1.05rem;color:var(--ink);}
+  .card-farm{font-size:0.82rem;color:var(--ink-soft);}
+  .card-meta{
+    display:flex;justify-content:space-between;align-items:center;margin-top:auto;padding-top:8px;
+  }
+  .card-price{font-family:'Fraunces',serif;font-weight:600;color:var(--green-dark);font-size:1.15rem;}
+  .card-dist{font-size:0.78rem;color:var(--ink-soft);}
+  .empty-state{
+    text-align:center;padding:60px 20px;color:var(--ink-soft);
+    border:1px dashed var(--line);border-radius:var(--radius);
+  }
+
+  /* ---------- HOW IT WORKS ---------- */
+  .how{background:var(--paper);}
+  .how-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:28px;}
+  .how-card{padding:26px;border:1px solid var(--line);border-radius:var(--radius);}
+  .how-card .num{
+    font-family:'Fraunces',serif;font-size:0.85rem;color:var(--gold-deep);font-weight:700;
+    margin-bottom:14px;
+  }
+  .how-card h3{font-size:1.15rem;color:var(--green-dark);margin-bottom:8px;}
+  .how-card p{color:var(--ink-soft);font-size:0.93rem;}
+
+  /* ---------- FEATURES ---------- */
+  .feature-grid{
+    display:grid;grid-template-columns:repeat(3,1fr);gap:2px;
+    background:var(--line);border:1px solid var(--line);
+  }
+  .feature{background:var(--cream);padding:26px;}
+  .feature h3{font-size:1rem;color:var(--green-dark);margin-bottom:8px;}
+  .feature p{font-size:0.88rem;color:var(--ink-soft);}
+
+  /* ---------- PRICING ---------- */
+  .pricing{background:var(--green-dark);color:var(--cream);}
+  .pricing .section-head h2{color:var(--paper);}
+  .pricing .section-head p{color:#C6D0B9;}
+  .plan-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;}
+  .plan{
+    background:var(--paper);color:var(--ink);border-radius:6px;padding:32px;
+    display:flex;flex-direction:column;gap:16px;
+  }
+  .plan.buyer{background:#FBF6E9;}
+  .plan-tag{font-size:0.8rem;font-weight:700;color:var(--gold-deep);text-transform:none;}
+  .plan h3{font-size:1.4rem;color:var(--green-dark);}
+  .plan-price{display:flex;align-items:baseline;gap:6px;}
+  .plan-price b{font-family:'Fraunces',serif;font-size:2.4rem;color:var(--ink);}
+  .plan-price span{color:var(--ink-soft);font-size:0.9rem;}
+  .plan ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px;}
+  .plan li{display:flex;gap:10px;font-size:0.92rem;color:var(--ink-soft);}
+  .plan li::before{content:"✓";color:var(--green);font-weight:700;}
+
+  /* ---------- FOOTER ---------- */
+  footer{padding:44px 0;border-top:1px solid var(--line);}
+  .foot-grid{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;}
+  .foot-note{font-size:0.82rem;color:var(--ink-soft);}
+
+  /* ---------- MODAL ---------- */
+  .overlay{
+    position:fixed;inset:0;background:rgba(36,28,21,0.55);
+    display:none;align-items:center;justify-content:center;padding:20px;z-index:100;
+  }
+  .overlay.open{display:flex;}
+  .modal{
+    background:var(--paper);border-radius:6px;max-width:440px;width:100%;
+    padding:30px;max-height:90vh;overflow-y:auto;
+  }
+  .modal-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;}
+  .modal-head h3{font-size:1.3rem;color:var(--green-dark);}
+  .modal-close{background:none;border:none;font-size:1.3rem;color:var(--ink-soft);line-height:1;}
+  .modal p.sub{color:var(--ink-soft);font-size:0.9rem;margin:0 0 20px;}
+  .field{margin-bottom:14px;}
+  .field label{display:block;font-size:0.84rem;font-weight:600;margin-bottom:6px;color:var(--ink);}
+  .field input,.field select{
+    width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:var(--radius);
+    font-family:inherit;font-size:0.92rem;background:var(--cream);
+  }
+  .stripe-mock{
+    border:1px solid var(--line);border-radius:var(--radius);padding:14px;margin:18px 0;
+    background:#F0EDE2;font-size:0.82rem;color:var(--ink-soft);
+  }
+  .stripe-mock b{color:var(--ink);}
+  .modal-msg{
+    display:none;background:var(--green-pale);color:var(--green-dark);
+    border-radius:var(--radius);padding:14px;font-size:0.88rem;margin-top:14px;
+  }
+  .modal-msg.show{display:block;}
+
+  @media(max-width:900px){
+    .hero-grid{grid-template-columns:1fr;}
+    .hero h1{font-size:2.3rem;max-width:none;}
+    .how-grid,.feature-grid{grid-template-columns:1fr;}
+    .plan-grid{grid-template-columns:1fr;}
+    .nav-links{display:none;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="nav">
+    <div class="logo">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M12 2C12 2 6 6 6 12C6 16.4183 8.68629 20 12 20C15.3137 20 18 16.4183 18 12C18 6 12 2 12 2Z" stroke="#1F3B2C" stroke-width="1.6"/><path d="M12 20V13" stroke="#1F3B2C" stroke-width="1.6" stroke-linecap="round"/></svg>
+      The Backyard Market
+    </div>
+    <nav class="nav-links">
+      <a href="#browse">Browse</a>
+      <a href="#how">How it works</a>
+      <a href="#pricing">Pricing</a>
+    </nav>
+    <div class="nav-ctas">
+      <button class="btn btn-outline btn-small" onclick="openModal('buyer')">Join as buyer</button>
+      <button class="btn btn-primary btn-small" onclick="openModal('farmer')">List your farm</button>
+    </div>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <div class="hero-eyebrow">A FARMERS MARKET, WITHOUT THE DRIVE</div>
+      <h1>Buy straight from the farm down the road.</h1>
+      <p>The Backyard Market connects local growers and ranchers directly with nearby buyers — no grocery markup, no middleman, just this week's harvest.</p>
+      <div class="hero-ctas">
+        <button class="btn btn-gold" onclick="openModal('buyer')">Find local goods — $9.99/yr</button>
+        <button class="btn btn-outline" style="border-color:var(--cream);color:var(--cream);" onclick="openModal('farmer')">Sell your harvest — $29.99/yr</button>
+      </div>
+      <div class="hero-stats">
+        <div class="hero-stat"><b>412</b><span>farms listed</span></div>
+        <div class="hero-stat"><b>18</b><span>categories</span></div>
+        <div class="hero-stat"><b>0%</b><span>markup on your price</span></div>
+      </div>
+    </div>
+    <div class="board">
+      <div class="board-head"><b>Today at the stand</b><span>UPDATED 6:02 AM</span></div>
+      <div class="board-row"><div><span class="item">Heirloom tomatoes</span><span class="tag">Rustling Pines Farm · Organic</span></div><span class="price">$4.50/lb</span></div>
+      <div class="board-row"><div><span class="item">Grass-fed ground beef</span><span class="tag">Cedar Hollow Ranch</span></div><span class="price">$9.00/lb</span></div>
+      <div class="board-row"><div><span class="item">Farm eggs, dozen</span><span class="tag">Little Bramble Farm · Organic</span></div><span class="price">$6.00</span></div>
+      <div class="board-row"><div><span class="item">Wildflower honey, 16oz</span><span class="tag">Old Orchard Apiary</span></div><span class="price">$11.00</span></div>
+    </div>
+  </div>
+</section>
+
+<section id="browse">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <h2>Browse what's fresh nearby</h2>
+        <p>Filter by category, or search for something specific. Every listing ships from a real farm within your region.</p>
+      </div>
+      <input id="searchBox" type="text" placeholder="Search listings…" oninput="renderListings()"
+        style="padding:11px 16px;border:1px solid var(--line);border-radius:20px;min-width:220px;background:var(--paper);">
+    </div>
+
+    <div class="chip-row" id="chipRow"></div>
+    <div class="listing-grid" id="listingGrid"></div>
+  </div>
+</section>
+
+<section class="how" id="how">
+  <div class="wrap">
+    <div class="section-head"><div><h2>How it works</h2></div></div>
+    <div class="how-grid">
+      <div class="how-card">
+        <div class="num">FOR FARMERS</div>
+        <h3>List in minutes</h3>
+        <p>Create your farm profile, add products by category, and set your own prices. $29.99 covers a full year of unlimited listings.</p>
+      </div>
+      <div class="how-card">
+        <div class="num">FOR BUYERS</div>
+        <h3>Browse &amp; reserve</h3>
+        <p>Search by category or distance, message the farmer directly, and reserve pickup or delivery. $9.99 a year, no per-order fees.</p>
+      </div>
+      <div class="how-card">
+        <div class="num">EVERYONE</div>
+        <h3>Meet up locally</h3>
+        <p>Pick up at the farm, a market stand, or a neighborhood drop point you both agree on. Payment for goods happens in person or via the order chat.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="section-head">
+      <div><h2>Built for how a local market actually works</h2>
+      <p>A few things worth adding beyond the basics — these are the features that tend to make or break a two-sided marketplace like this one.</p></div>
+    </div>
+    <div class="feature-grid">
+      <div class="feature"><h3>Verified farm badges</h3><p>Farmers can upload a certification (USDA Organic, Certified Naturally Grown, etc.) that shows as a badge on listings — builds trust without you policing every claim.</p></div>
+      <div class="feature"><h3>Seasonal availability</h3><p>Listings can be marked "in season," "pre-order," or "sold out for the year" so buyers aren't disappointed and farmers aren't fielding the same question weekly.</p></div>
+      <div class="feature"><h3>In-app messaging</h3><p>Buyers and farmers coordinate pickup times and quantities without exchanging phone numbers up front.</p></div>
+      <div class="feature"><h3>Map &amp; distance search</h3><p>"Show me everything within 15 miles" matters more here than almost any other filter — worth building before most other features.</p></div>
+      <div class="feature"><h3>CSA / subscription boxes</h3><p>Let farmers offer a recurring weekly box in addition to one-off listings — a second revenue stream for them, and a reason for buyers to keep coming back.</p></div>
+      <div class="feature"><h3>Ratings &amp; repeat-buyer history</h3><p>Simple 5-star reviews after pickup, plus a "bought again" signal — the thing that makes people trust a stranger's tomatoes.</p></div>
+      <div class="feature"><h3>Market &amp; pop-up calendar</h3><p>Farmers can list physical market dates/locations too, not just standing listings — useful even for farmers who mainly still sell in person.</p></div>
+      <div class="feature"><h3>Bulk / wholesale tier</h3><p>A toggle for restaurants or co-ops buying in volume, with quantity-based pricing — a natural upsell once you have both sides established.</p></div>
+      <div class="feature"><h3>Waitlist for sold-out items</h3><p>"Notify me when more grass-fed beef is available" keeps demand visible to farmers instead of just vanishing.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="pricing" id="pricing">
+  <div class="wrap">
+    <div class="section-head"><div><h2>Simple annual pricing</h2><p>One flat fee, no commission on sales — farmers keep 100% of what they price their goods at.</p></div></div>
+    <div class="plan-grid">
+      <div class="plan farmer">
+        <span class="plan-tag">FOR FARMERS</span>
+        <h3>Farmer listing</h3>
+        <div class="plan-price"><b>$29.99</b><span>/ year</span></div>
+        <ul>
+          <li>Unlimited product listings</li>
+          <li>Your own farm profile page</li>
+          <li>Listed across all relevant categories</li>
+          <li>In-app messaging with buyers</li>
+          <li>Seasonal &amp; sold-out status controls</li>
+          <li>No commission — you set your prices</li>
+        </ul>
+        <button class="btn btn-primary btn-block" onclick="openModal('farmer')">Start selling</button>
+      </div>
+      <div class="plan buyer">
+        <span class="plan-tag">FOR BUYERS</span>
+        <h3>Buyer membership</h3>
+        <div class="plan-price"><b>$9.99</b><span>/ year</span></div>
+        <ul>
+          <li>Unlimited browsing &amp; search</li>
+          <li>Message farmers directly</li>
+          <li>Reserve pickup or delivery slots</li>
+          <li>Save favorite farms &amp; get restock alerts</li>
+          <li>Distance &amp; category filters</li>
+          <li>No per-order fees</li>
+        </ul>
+        <button class="btn btn-gold btn-block" onclick="openModal('buyer')">Start browsing</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap foot-grid">
+    <div class="logo" style="font-size:1.1rem;">The Backyard Market</div>
+    <div class="foot-note">Prototype build — Stripe checkout below is a working UI wired to a mock request; see notes for going live.</div>
+  </div>
+</footer>
+
+<!-- MODAL -->
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <div class="modal-head">
+      <h3 id="modalTitle">Join as a buyer</h3>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <p class="sub" id="modalSub">$9.99/year · cancel anytime</p>
+
+    <div class="field"><label for="fName">Full name</label><input id="fName" type="text" placeholder="Jordan Alvarez"></div>
+    <div class="field"><label for="fEmail">Email</label><input id="fEmail" type="email" placeholder="jordan@email.com"></div>
+    <div class="field" id="farmField" style="display:none;"><label for="fFarm">Farm name</label><input id="fFarm" type="text" placeholder="Rustling Pines Farm"></div>
+    <div class="field"><label for="fZip">ZIP code</label><input id="fZip" type="text" placeholder="97205"></div>
+
+    <div class="stripe-mock">
+      <b>Payment — powered by Stripe</b><br>
+      This is a UI mockup of Stripe Checkout. A live version redirects here to Stripe's hosted payment page, charges the card, and creates a recurring annual subscription via a server-side Checkout Session — the secret key never touches the browser.
+    </div>
+
+    <button class="btn btn-primary btn-block" id="modalSubmit" onclick="submitForm()">Continue to payment — $9.99/yr</button>
+    <div class="modal-msg" id="modalMsg">You're in! In the live version, this is the moment Stripe redirects you to a secure checkout page to complete your $<span id="msgAmount">9.99</span>/year subscription.</div>
+  </div>
+</div>
+
+<script>
+  const CATEGORIES = ["All","Organic","Non-Organic","Beef & Meat","Poultry & Eggs","Fruits","Vegetables","Dairy","Herbs","Honey & Preserves"];
+
+  const LISTINGS = [
+    {name:"Heirloom Tomatoes", farm:"Rustling Pines Farm", cat:"Organic", cat2:"Vegetables", price:"$4.50/lb", dist:"3.2 mi", emoji:"🍅", color:"#B8481F"},
+    {name:"Grass-Fed Ground Beef", farm:"Cedar Hollow Ranch", cat:"Beef & Meat", price:"$9.00/lb", dist:"6.8 mi", emoji:"🐄", color:"#6B4A32"},
+    {name:"Farm Eggs, Dozen", farm:"Little Bramble Farm", cat:"Organic", cat2:"Poultry & Eggs", price:"$6.00", dist:"2.1 mi", emoji:"🥚", color:"#D4A24C"},
+    {name:"Wildflower Honey", farm:"Old Orchard Apiary", cat:"Honey & Preserves", price:"$11.00", dist:"9.4 mi", emoji:"🍯", color:"#C9902E"},
+    {name:"Rainbow Carrots", farm:"Sunlit Acres", cat:"Organic", cat2:"Vegetables", price:"$3.25/bunch", dist:"4.0 mi", emoji:"🥕", color:"#D96A2B"},
+    {name:"Raw Whole Milk", farm:"Pasture & Pail Dairy", cat:"Dairy", price:"$7.50/gal", dist:"11.2 mi", emoji:"🥛", color:"#8FA98C"},
+    {name:"Honeycrisp Apples", farm:"Stony Ridge Orchard", cat:"Fruits", price:"$2.80/lb", dist:"7.5 mi", emoji:"🍎", color:"#9C2B2B"},
+    {name:"Pork Chops", farm:"Cedar Hollow Ranch", cat:"Non-Organic", cat2:"Beef & Meat", price:"$8.25/lb", dist:"6.8 mi", emoji:"🐖", color:"#C77B6C"},
+    {name:"Fresh Basil", farm:"Little Bramble Farm", cat:"Herbs", price:"$2.00/bunch", dist:"2.1 mi", emoji:"🌿", color:"#4A6B3E"},
+    {name:"Sweet Corn", farm:"Sunlit Acres", cat:"Non-Organic", cat2:"Vegetables", price:"$0.75/ear", dist:"4.0 mi", emoji:"🌽", color:"#D9B23C"},
+    {name:"Whole Chicken", farm:"Rustling Pines Farm", cat:"Poultry & Eggs", price:"$4.50/lb", dist:"3.2 mi", emoji:"🍗", color:"#B8481F"},
+    {name:"Strawberries", farm:"Stony Ridge Orchard", cat:"Organic", cat2:"Fruits", price:"$5.00/pint", dist:"7.5 mi", emoji:"🍓", color:"#B23A4F"},
+  ];
+
+  let activeCat = "All";
+
+  function renderChips(){
+    const row = document.getElementById('chipRow');
+    row.innerHTML = CATEGORIES.map(c =>
+      `<button class="chip ${c===activeCat?'active':''}" onclick="setCategory('${c}')">${c}</button>`
+    ).join('');
+  }
+
+  function setCategory(c){
+    activeCat = c;
+    renderChips();
+    renderListings();
+  }
+
+  function renderListings(){
+    const search = document.getElementById('searchBox').value.trim().toLowerCase();
+    const grid = document.getElementById('listingGrid');
+    const filtered = LISTINGS.filter(l => {
+      const matchesCat = activeCat === "All" || l.cat === activeCat || l.cat2 === activeCat;
+      const matchesSearch = !search || l.name.toLowerCase().includes(search) || l.farm.toLowerCase().includes(search);
+      return matchesCat && matchesSearch;
+    });
+
+    if(filtered.length === 0){
+      grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1;">No listings match yet — try a different category or search term.</div>`;
+      return;
+    }
+
+    grid.innerHTML = filtered.map(l => `
+      <div class="card">
+        <div class="card-photo" style="background:${l.color};">
+          <span class="card-badge">${l.cat}</span>
+          ${l.emoji}
+        </div>
+        <div class="card-body">
+          <h3>${l.name}</h3>
+          <div class="card-farm">${l.farm}</div>
+          <div class="card-meta">
+            <span class="card-price">${l.price}</span>
+            <span class="card-dist">${l.dist} away</span>
+          </div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  renderChips();
+  renderListings();
+
+  // Modal logic
+  function openModal(type){
+    document.getElementById('overlay').classList.add('open');
+    document.getElementById('modalMsg').classList.remove('show');
+    document.getElementById('modalSubmit').style.display = 'block';
+    if(type === 'farmer'){
+      document.getElementById('modalTitle').textContent = "List your farm";
+      document.getElementById('modalSub').textContent = "$29.99/year · unlimited listings";
+      document.getElementById('farmField').style.display = 'block';
+      document.getElementById('modalSubmit').textContent = "Continue to payment — $29.99/yr";
+      document.getElementById('msgAmount').textContent = "29.99";
+    } else {
+      document.getElementById('modalTitle').textContent = "Join as a buyer";
+      document.getElementById('modalSub').textContent = "$9.99/year · cancel anytime";
+      document.getElementById('farmField').style.display = 'none';
+      document.getElementById('modalSubmit').textContent = "Continue to payment — $9.99/yr";
+      document.getElementById('msgAmount').textContent = "9.99";
+    }
+  }
+  function closeModal(){
+    document.getElementById('overlay').classList.remove('open');
+  }
+  function submitForm(){
+    document.getElementById('modalMsg').classList.add('show');
+    document.getElementById('modalSubmit').style.display = 'none';
+  }
+  document.getElementById('overlay').addEventListener('click', e => {
+    if(e.target.id === 'overlay') closeModal();
+  });
+</script>
+</body>
+</html>
