@@ -159,7 +159,7 @@
 
 <script>
   // Point this at your deployed API. During local dev this is usually http://localhost:4242.
-  const API_BASE = window.location.origin.includes('localhost') ? 'http://localhost:4242' : '';
+  const API_BASE = window.location.origin.includes('localhost') ? 'http://localhost:4242' : 'https://thebackyardmarket.onrender.com';
 
   let token = localStorage.getItem('ff_token');
   let currentUser = JSON.parse(localStorage.getItem('ff_user') || 'null');
