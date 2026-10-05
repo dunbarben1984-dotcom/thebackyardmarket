@@ -45,8 +45,8 @@ app.get('/api/debug/signup-test', async (req, res) => {
   try {
     const db = require('./db');
     const r = await db.query('SELECT 1 as x');
-    out.db_select = 'ok';
-  } catch (e) { out.db_select = 'FAIL: ' + e.message; }
+    out.db_select = 'ok rows=' + r.rows.length;
+  } catch (e) { out.db_select = 'FAIL: ' + JSON.stringify({msg: e.message, code: e.code, name: e.name, str: String(e)}); }
   try {
     const db = require('./db');
     await db.query(`INSERT INTO users (email, password_hash, full_name, role, zip_code) VALUES ($1,$2,$3,$4,$5)`, ['debug_del_me@example.com','x','Debug','buyer','00000']);
