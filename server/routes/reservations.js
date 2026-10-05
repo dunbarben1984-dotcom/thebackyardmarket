@@ -14,12 +14,13 @@ router.post('/', requireAuth, async (req, res, next) => {
 
     // Verify listing exists and is active
     const listingResult = await db.query(
-      'SELECT id, user_id, quantity_available FROM listings WHERE id = $1',
+      `SELECT l.id, l.quantity_available, f.user_id as farmer_id
+       FROM listings l JOIN farms f ON f.id = l.farm_id WHERE l.id = $1`,
       [listingId]
     );
     const listing = listingResult.rows[0];
     if (!listing) return res.status(404).json({ error: 'Listing not found.' });
-    if (listing.user_id === req.user.id) {
+    if (listing.farmer_id === req.user.id) {
       return res.status(400).json({ error: 'You cannot reserve your own listing.' });
     }
 
@@ -41,7 +42,8 @@ router.get('/mine', requireAuth, async (req, res, next) => {
       `SELECT r.*, l.name as listing_name, l.price_cents, l.unit, u.full_name as farmer_name
        FROM reservations r
        JOIN listings l ON l.id = r.listing_id
-       JOIN users u ON u.id = l.user_id
+       JOIN farms f ON f.id = l.farm_id
+       JOIN users u ON u.id = f.user_id
        WHERE r.buyer_id = $1 ORDER BY r.created_at DESC`,
       [req.user.id]
     );
@@ -58,8 +60,9 @@ router.get('/for-farmer', requireAuth, requireActiveSubscription('farmer'), asyn
       `SELECT r.*, l.name as listing_name, l.price_cents, l.unit, u.full_name as buyer_name, u.email as buyer_email
        FROM reservations r
        JOIN listings l ON l.id = r.listing_id
+       JOIN farms f ON f.id = l.farm_id
        JOIN users u ON u.id = r.buyer_id
-       WHERE l.user_id = $1 ORDER BY r.created_at DESC`,
+       WHERE f.user_id = $1 ORDER BY r.created_at DESC`,
       [req.user.id]
     );
     res.json(result.rows);
@@ -79,8 +82,9 @@ router.put('/:id', requireAuth, async (req, res, next) => {
 
     // Check if user owns the reservation (buyer) or the listing (farmer)
     const check = await db.query(
-      `SELECT r.*, l.user_id as farmer_id FROM reservations r
-       JOIN listings l ON l.id = r.listing_id WHERE r.id = $1`,
+      `SELECT r.*, f.user_id as farmer_id FROM reservations r
+       JOIN listings l ON l.id = r.listing_id
+       JOIN farms f ON f.id = l.farm_id WHERE r.id = $1`,
       [req.params.id]
     );
     const res_row = check.rows[0];
