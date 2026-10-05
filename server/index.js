@@ -6,6 +6,7 @@ const authRoutes = require('./routes/auth');
 const billingRoutes = require('./routes/billing');
 const listingsRoutes = require('./routes/listings');
 const messagesRoutes = require('./routes/messages');
+const reservationsRoutes = require('./routes/reservations');
 
 const app = express();
 
@@ -24,6 +25,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/billing', billingRoutes);
 app.use('/api/listings', listingsRoutes);
 app.use('/api/messages', messagesRoutes);
+app.use('/api/reservations', reservationsRoutes);
 
 // Central error handler — keeps stack traces out of API responses
 app.use((err, req, res, next) => {
