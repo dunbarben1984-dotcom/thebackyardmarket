@@ -19,9 +19,12 @@ function requireAuth(req, res, next) {
 // Blocks the route unless the signed-in user has an active subscription
 // matching the role passed in (e.g. requireActiveSubscription('farmer')).
 // Site owners listed in ADMIN_EMAILS bypass the check entirely.
+// When FREE_MODE=true, everyone gets full access (used for launch/beta).
 function requireActiveSubscription(role) {
   return async (req, res, next) => {
     try {
+      if (process.env.FREE_MODE === 'true') return next();
+
       const admins = (process.env.ADMIN_EMAILS || '').split(',').map(s => s.trim().toLowerCase());
       if (admins.includes((req.user.email || '').toLowerCase())) return next();
 
