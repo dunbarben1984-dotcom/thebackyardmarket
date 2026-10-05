@@ -33,3 +33,25 @@ app.use((err, req, res, next) => {
 
 const PORT = process.env.PORT || 4242;
 app.listen(PORT, () => console.log(`TheBackyardMarket.com API running on port ${PORT}`));
+
+// TEMPORARY DEBUG — remove before production
+app.get('/api/debug/signup-test', async (req, res) => {
+  const out = {};
+  try {
+    const bcrypt = require('bcrypt');
+    const h = await bcrypt.hash('test123', 4);
+    out.bcrypt = 'ok';
+  } catch (e) { out.bcrypt = 'FAIL: ' + e.message; }
+  try {
+    const db = require('./db');
+    const r = await db.query('SELECT 1 as x');
+    out.db_select = 'ok';
+  } catch (e) { out.db_select = 'FAIL: ' + e.message; }
+  try {
+    const db = require('./db');
+    await db.query(`INSERT INTO users (email, password_hash, full_name, role, zip_code) VALUES ($1,$2,$3,$4,$5)`, ['debug_del_me@example.com','x','Debug','buyer','00000']);
+    out.db_insert = 'ok';
+    await db.query(`DELETE FROM users WHERE email='debug_del_me@example.com'`);
+  } catch (e) { out.db_insert = 'FAIL: ' + e.message; }
+  res.json(out);
+});
