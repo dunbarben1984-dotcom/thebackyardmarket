@@ -407,7 +407,7 @@
 <footer>
   <div class="wrap foot-grid">
     <div class="logo" style="font-size:1.1rem;">The Backyard Market</div>
-    <div class="foot-note">Prototype build — Stripe checkout below is a working UI wired to a mock request; see notes for going live.</div>
+    <div class="foot-note">The Backyard Market — fresh food straight from local farms.</div>
   </div>
 </footer>
 
@@ -505,6 +505,9 @@
 
   // Modal logic
   function openModal(type){
+    // Send users to the real signup flow on the dashboard — the modal below was a UI mockup.
+    window.location.href = 'dashboard.html' + (type === 'farmer' ? '?role=farmer' : '?role=buyer');
+    return;
     document.getElementById('overlay').classList.add('open');
     document.getElementById('modalMsg').classList.remove('show');
     document.getElementById('modalSubmit').style.display = 'block';
