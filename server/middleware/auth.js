@@ -18,9 +18,13 @@ function requireAuth(req, res, next) {
 
 // Blocks the route unless the signed-in user has an active subscription
 // matching the role passed in (e.g. requireActiveSubscription('farmer')).
+// Site owners listed in ADMIN_EMAILS bypass the check entirely.
 function requireActiveSubscription(role) {
   return async (req, res, next) => {
     try {
+      const admins = (process.env.ADMIN_EMAILS || '').split(',').map(s => s.trim().toLowerCase());
+      if (admins.includes((req.user.email || '').toLowerCase())) return next();
+
       const result = await db.query(
         `SELECT status FROM subscriptions WHERE user_id = $1 AND plan = $2 ORDER BY created_at DESC LIMIT 1`,
         [req.user.id, role]
