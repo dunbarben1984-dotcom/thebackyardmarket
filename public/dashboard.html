@@ -143,6 +143,11 @@
         </div>
         <div class="field"><label><input type="checkbox" id="lOrganic" style="width:auto;margin-right:6px;">Organic / certified</label></div>
         <div class="field"><label>Description (optional)</label><input id="lDescription" type="text"></div>
+        <div class="field">
+          <label>Photo of your produce (optional)</label>
+          <input id="lPhoto" type="file" accept="image/*" capture="environment" onchange="previewListingPhoto(this)">
+          <img id="lPhotoPreview" style="display:none;max-width:200px;max-height:150px;border-radius:8px;margin-top:8px;" alt="Photo preview">
+        </div>
         <button class="btn btn-primary btn-small" onclick="createListing()">Save listing</button>
         <button class="btn btn-outline btn-small" onclick="closeNewListingForm()">Cancel</button>
         <div class="msg error" id="listingMsg"></div>
@@ -281,6 +286,33 @@
   function openNewListingForm(){ document.getElementById('newListingForm').style.display = 'block'; }
   function closeNewListingForm(){ document.getElementById('newListingForm').style.display = 'none'; }
 
+  // Compress the chosen photo client-side (max 800px, JPEG) and stash as data URL.
+  let listingPhotoDataUrl = null;
+  function previewListingPhoto(input){
+    const file = input.files && input.files[0];
+    listingPhotoDataUrl = null;
+    const preview = document.getElementById('lPhotoPreview');
+    preview.style.display = 'none';
+    if (!file) return;
+    const img = new Image();
+    img.onload = function(){
+      const maxDim = 800;
+      let w = img.width, h = img.height;
+      if (w > maxDim || h > maxDim){
+        const scale = maxDim / Math.max(w, h);
+        w = Math.round(w * scale); h = Math.round(h * scale);
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      listingPhotoDataUrl = canvas.toDataURL('image/jpeg', 0.72);
+      preview.src = listingPhotoDataUrl;
+      preview.style.display = 'block';
+      URL.revokeObjectURL(img.src);
+    };
+    img.src = URL.createObjectURL(file);
+  }
+
   async function loadListings(){
     try{
       const listings = await api('/listings/mine/all');
@@ -311,9 +343,14 @@
       priceCents: Math.round(parseFloat(document.getElementById('lPrice').value || '0') * 100),
       unit: document.getElementById('lUnit').value,
       description: document.getElementById('lDescription').value,
+      imageUrl: listingPhotoDataUrl,
     };
     try{
       await api('/listings', { method:'POST', body });
+      // reset photo state
+      listingPhotoDataUrl = null;
+      document.getElementById('lPhoto').value = '';
+      document.getElementById('lPhotoPreview').style.display = 'none';
       closeNewListingForm();
       await loadListings();
     }catch(err){

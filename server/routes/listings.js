@@ -28,7 +28,7 @@ router.get('/', async (req, res, next) => {
     const where = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
     const result = await db.query(
       `SELECT l.id, l.name, l.category, l.organic, l.price_cents, l.unit, l.description,
-              l.status, l.quantity_available, l.created_at,
+              l.status, l.quantity_available, l.created_at, l.image_url,
               f.id AS farm_id, f.farm_name, f.zip_code, f.certified, f.certification
        FROM listings l
        JOIN farms f ON f.id = l.farm_id
@@ -46,7 +46,7 @@ router.get('/', async (req, res, next) => {
 // POST /api/listings — farmer only, and only with an active farmer subscription
 router.post('/', requireAuth, requireActiveSubscription('farmer'), async (req, res, next) => {
   try {
-    const { name, category, organic, priceCents, unit, description, quantityAvailable } = req.body;
+    const { name, category, organic, priceCents, unit, description, quantityAvailable, imageUrl } = req.body;
     if (!name || !category || !priceCents || !unit) {
       return res.status(400).json({ error: 'name, category, priceCents, and unit are required.' });
     }
@@ -56,9 +56,9 @@ router.post('/', requireAuth, requireActiveSubscription('farmer'), async (req, r
     if (!farm) return res.status(400).json({ error: 'No farm profile found for this account.' });
 
     const result = await db.query(
-      `INSERT INTO listings (farm_id, name, category, organic, price_cents, unit, description, quantity_available)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8) RETURNING *`,
-      [farm.id, name, category, !!organic, priceCents, unit, description || null, quantityAvailable || null]
+      `INSERT INTO listings (farm_id, name, category, organic, price_cents, unit, description, quantity_available, image_url)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING *`,
+      [farm.id, name, category, !!organic, priceCents, unit, description || null, quantityAvailable || null, imageUrl || null]
     );
     res.status(201).json(result.rows[0]);
   } catch (err) {
@@ -70,7 +70,7 @@ router.post('/', requireAuth, requireActiveSubscription('farmer'), async (req, r
 router.put('/:id', requireAuth, requireActiveSubscription('farmer'), async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { name, category, organic, priceCents, unit, description, status, quantityAvailable } = req.body;
+    const { name, category, organic, priceCents, unit, description, status, quantityAvailable, imageUrl } = req.body;
 
     const ownsListing = await db.query(
       `SELECT l.id FROM listings l JOIN farms f ON f.id = l.farm_id WHERE l.id = $1 AND f.user_id = $2`,
@@ -88,9 +88,10 @@ router.put('/:id', requireAuth, requireActiveSubscription('farmer'), async (req,
          description = COALESCE($6, description),
          status = COALESCE($7, status),
          quantity_available = COALESCE($8, quantity_available),
+         image_url = COALESCE($9, image_url),
          updated_at = now()
-       WHERE id = $9 RETURNING *`,
-      [name, category, organic, priceCents, unit, description, status, quantityAvailable, id]
+       WHERE id = $10 RETURNING *`,
+      [name, category, organic, priceCents, unit, description, status, quantityAvailable, imageUrl, id]
     );
     res.json(result.rows[0]);
   } catch (err) {
