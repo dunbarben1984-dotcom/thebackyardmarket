@@ -100,6 +100,7 @@
         <div><label>ZIP code</label><input id="suZip" type="text"></div>
       </div>
       <div class="field" id="suFarmField"><label>Farm name</label><input id="suFarmName" type="text"></div>
+      <div class="field"><label style="font-weight:normal;font-size:.9em;"><input type="checkbox" id="suTerms" style="width:auto;margin-right:6px;">I agree to the <a href="/terms.html" target="_blank">Terms of Service</a> and <a href="/privacy.html" target="_blank">Privacy Policy</a></label></div>
       <button class="btn btn-primary" style="width:100%;" onclick="signup()">Create account</button>
       <div class="msg error" id="signupMsg"></div>
     </div>
@@ -218,6 +219,10 @@
   }
 
   async function signup(){
+    if (!document.getElementById('suTerms').checked){
+      document.getElementById('signupMsg').textContent = 'Please agree to the Terms of Service and Privacy Policy.';
+      return;
+    }
     const body = {
       fullName: document.getElementById('suName').value,
       email: document.getElementById('suEmail').value,
