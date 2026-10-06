@@ -16,7 +16,7 @@ db.query(`ALTER TABLE listings ADD COLUMN IF NOT EXISTS image_url TEXT`).catch(e
 
 const app = express();
 
-const allowedOrigins = (process.env.CLIENT_URL || '').split(',').map(s => s.trim()).filter(Boolean);
+const allowedOrigins = (process.env.CLIENT_URL || 'https://thebackyardmarket.com,https://regal-zuccutto-1b3806.netlify.app').split(',').map(s => s.trim()).filter(Boolean);
 app.use(cors({
   origin: (origin, cb) => {
     // Allow same-origin/non-browser requests and any configured client URL
