@@ -324,7 +324,7 @@
 
     <div class="chip-row" id="chipRow"></div>
     <div class="listing-grid" id="listingGrid"></div>
-    <p style="font-size:.85em;color:var(--muted);margin-top:16px;max-width:640px;background:var(--cream);border:1px solid var(--line);border-radius:8px;padding:12px 16px;">🚧 <strong>Demo preview:</strong> the listings shown here are samples. <a href="dashboard.html?role=buyer" style="color:var(--green);">Join as a buyer ($9.99/yr)</a> or <a href="dashboard.html?role=farmer" style="color:var(--green);">list your farm ($29.99/yr)</a> to browse and reserve real local produce.</p>
+    <p id="demoNotice" style="font-size:.85em;color:var(--muted);margin-top:16px;max-width:640px;background:var(--cream);border:1px solid var(--line);border-radius:8px;padding:12px 16px;">🚧 <strong>Demo preview:</strong> the listings shown here are samples. <a href="dashboard.html?role=buyer" style="color:var(--green);">Join as a buyer ($9.99/yr)</a> or <a href="dashboard.html?role=farmer" style="color:var(--green);">list your farm ($29.99/yr)</a> to browse and reserve real local produce.</p>
     <p style="font-size:.82em;color:var(--muted);margin-top:12px;max-width:640px;">All products are sold by independent farmers, not by The Backyard Market. We don't inspect or guarantee any product — please inspect items at pickup and ask the farmer about ingredients and allergens before consuming.</p>
   </div>
 </section>
@@ -461,6 +461,31 @@
   ];
 
   let activeCat = "All";
+  let realListings = [];
+
+  // Fetch real listings from the API; fall back to samples if none exist yet.
+  fetch('https://thebackyardmarket.onrender.com/api/listings')
+    .then(r => r.json())
+    .then(data => {
+      if (Array.isArray(data) && data.length > 0) {
+        realListings = data.map(l => ({
+          name: l.name,
+          farm: l.farm_name || 'Local farm',
+          cat: l.organic ? 'Organic' : l.category,
+          cat2: l.category,
+          price: `$${(l.price_cents / 100).toFixed(2)}/${l.unit}`,
+          dist: '',
+          emoji: '🌱',
+          color: '#4A6B3E',
+          image: l.image_url || null,
+        }));
+        // Hide the demo notice once real listings exist
+        const demo = document.getElementById('demoNotice');
+        if (demo) demo.style.display = 'none';
+        renderListings();
+      }
+    })
+    .catch(() => {});
 
   function renderChips(){
     const row = document.getElementById('chipRow');
@@ -478,7 +503,8 @@
   function renderListings(){
     const search = document.getElementById('searchBox').value.trim().toLowerCase();
     const grid = document.getElementById('listingGrid');
-    const filtered = LISTINGS.filter(l => {
+    const source = realListings.length > 0 ? realListings : LISTINGS;
+    const filtered = source.filter(l => {
       const matchesCat = activeCat === "All" || l.cat === activeCat || l.cat2 === activeCat;
       const matchesSearch = !search || l.name.toLowerCase().includes(search) || l.farm.toLowerCase().includes(search);
       return matchesCat && matchesSearch;
@@ -492,15 +518,17 @@
     grid.innerHTML = filtered.map(l => `
       <div class="card">
         <div class="card-photo" style="background:${l.color};">
+          ${l.image
+            ? `<img src="${l.image}" alt="${l.name}" style="width:100%;height:100%;object-fit:cover;">`
+            : l.emoji}
           <span class="card-badge">${l.cat}</span>
-          ${l.emoji}
         </div>
         <div class="card-body">
           <h3>${l.name}</h3>
           <div class="card-farm">${l.farm}</div>
           <div class="card-meta">
             <span class="card-price">${l.price}</span>
-            <span class="card-dist">${l.dist} away</span>
+            ${l.dist ? `<span class="card-dist">${l.dist} away</span>` : ''}
           </div>
         </div>
       </div>
