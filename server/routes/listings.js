@@ -4,6 +4,17 @@ const { requireAuth, requireActiveSubscription } = require('../middleware/auth')
 
 const router = express.Router();
 
+// GET /api/listings/stats — public counts for the homepage (real numbers, not hardcoded)
+router.get('/stats', async (req, res, next) => {
+  try {
+    const farms = await db.query('SELECT COUNT(*)::int AS c FROM farms');
+    const listings = await db.query(`SELECT COUNT(*)::int AS c FROM listings WHERE status = 'available'`);
+    res.json({ farms: farms.rows[0].c, activeListings: listings.rows[0].c });
+  } catch (err) {
+    next(err);
+  }
+});
+
 // GET /api/listings?category=Organic&search=tomato&zip=97205
 // Public — no auth required, so the homepage can browse without signing in.
 router.get('/', async (req, res, next) => {

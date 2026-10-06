@@ -323,7 +323,8 @@
 
     <div class="chip-row" id="chipRow"></div>
     <div class="listing-grid" id="listingGrid"></div>
-    <p style="font-size:.82em;color:var(--muted);margin-top:18px;max-width:640px;">All products are sold by independent farmers, not by The Backyard Market. We don't inspect or guarantee any product — please inspect items at pickup and ask the farmer about ingredients and allergens before consuming.</p>
+    <p style="font-size:.85em;color:var(--muted);margin-top:16px;max-width:640px;background:var(--cream);border:1px solid var(--line);border-radius:8px;padding:12px 16px;">🚧 <strong>Demo preview:</strong> the listings shown here are samples. <a href="dashboard.html?role=buyer" style="color:var(--green);">Join as a buyer ($9.99/yr)</a> or <a href="dashboard.html?role=farmer" style="color:var(--green);">list your farm ($29.99/yr)</a> to browse and reserve real local produce.</p>
+    <p style="font-size:.82em;color:var(--muted);margin-top:12px;max-width:640px;">All products are sold by independent farmers, not by The Backyard Market. We don't inspect or guarantee any product — please inspect items at pickup and ask the farmer about ingredients and allergens before consuming.</p>
   </div>
 </section>
 
@@ -507,6 +508,15 @@
 
   renderChips();
   renderListings();
+
+  // Pull real farm/listing counts from the API instead of hardcoded numbers.
+  fetch('https://thebackyardmarket.onrender.com/api/listings/stats')
+    .then(r => r.json())
+    .then(s => {
+      const farmStat = document.querySelector('.hero-stat b');
+      if (farmStat && typeof s.farms === 'number') farmStat.textContent = s.farms;
+    })
+    .catch(() => {});
 
   // Modal logic
   function openModal(type){
