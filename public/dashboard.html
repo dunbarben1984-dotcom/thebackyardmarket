@@ -267,8 +267,13 @@
     // In a full build this hits GET /api/billing/status; shown here inline via a lightweight
     // convention — subscription state also arrives via the JWT refresh after checkout.
     const planLabel = currentUser.role === 'farmer' ? 'Farmer listing — $29.99/yr' : 'Buyer membership — $9.99/yr';
-    document.getElementById('billingStatus').textContent = `Plan: ${planLabel}`;
     const actions = document.getElementById('billingActions');
+    if (currentUser.isAdmin){
+      document.getElementById('billingStatus').textContent = `Plan: ${planLabel} — Active (site admin, no payment required)`;
+      actions.innerHTML = `<button class="btn btn-outline btn-small" onclick="openPortal()">Manage billing</button>`;
+      return;
+    }
+    document.getElementById('billingStatus').textContent = `Plan: ${planLabel}`;
     actions.innerHTML = `
       <button class="btn btn-gold btn-small" onclick="startCheckout()">Set up / update payment</button>
       <button class="btn btn-outline btn-small" onclick="openPortal()">Manage billing</button>

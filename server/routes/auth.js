@@ -5,8 +5,13 @@ const db = require('../db');
 
 const router = express.Router();
 
+function isAdminEmail(email) {
+  const { isAdminEmail } = require('../middleware/auth');
+  return isAdminEmail(email);
+}
+
 function signToken(user) {
-  return jwt.sign({ id: user.id, email: user.email, role: user.role }, process.env.JWT_SECRET, {
+  return jwt.sign({ id: user.id, email: user.email, role: user.role, isAdmin: isAdminEmail(user.email) }, process.env.JWT_SECRET, {
     expiresIn: '365d',
   });
 }

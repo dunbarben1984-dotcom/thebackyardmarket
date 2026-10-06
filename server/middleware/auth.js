@@ -20,16 +20,19 @@ function requireAuth(req, res, next) {
 // matching the role passed in (e.g. requireActiveSubscription('farmer')).
 // Site owners listed in ADMIN_EMAILS bypass the check entirely.
 // When FREE_MODE=true, everyone gets full access (used for launch/beta).
+function isAdminEmail(email) {
+  const admins = (process.env.ADMIN_EMAILS || '').split(',').map(s => s.trim().toLowerCase());
+  const e = (email || '').toLowerCase();
+  const base = e.replace(/\+[^@]*@/, '@');
+  return admins.includes(e) || admins.includes(base);
+}
+
 function requireActiveSubscription(role) {
   return async (req, res, next) => {
     try {
       if (process.env.FREE_MODE === 'true') return next();
 
-      const admins = (process.env.ADMIN_EMAILS || '').split(',').map(s => s.trim().toLowerCase());
-      const userEmail = (req.user.email || '').toLowerCase();
-      // Match plus-addressed variants too (e.g. user+buyer@x.com matches user@x.com)
-      const baseEmail = userEmail.replace(/\+[^@]*@/, '@');
-      if (admins.includes(userEmail) || admins.includes(baseEmail)) return next();
+      if (isAdminEmail(req.user.email)) return next();
 
       const result = await db.query(
         `SELECT status FROM subscriptions WHERE user_id = $1 AND plan = $2 ORDER BY created_at DESC LIMIT 1`,
@@ -49,4 +52,4 @@ function requireActiveSubscription(role) {
   };
 }
 
-module.exports = { requireAuth, requireActiveSubscription };
+module.exports = { requireAuth, requireActiveSubscription, isAdminEmail };
