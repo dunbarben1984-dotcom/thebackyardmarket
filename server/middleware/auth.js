@@ -26,7 +26,10 @@ function requireActiveSubscription(role) {
       if (process.env.FREE_MODE === 'true') return next();
 
       const admins = (process.env.ADMIN_EMAILS || '').split(',').map(s => s.trim().toLowerCase());
-      if (admins.includes((req.user.email || '').toLowerCase())) return next();
+      const userEmail = (req.user.email || '').toLowerCase();
+      // Match plus-addressed variants too (e.g. user+buyer@x.com matches user@x.com)
+      const baseEmail = userEmail.replace(/\+[^@]*@/, '@');
+      if (admins.includes(userEmail) || admins.includes(baseEmail)) return next();
 
       const result = await db.query(
         `SELECT status FROM subscriptions WHERE user_id = $1 AND plan = $2 ORDER BY created_at DESC LIMIT 1`,
