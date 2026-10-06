@@ -16,7 +16,15 @@ db.query(`ALTER TABLE listings ADD COLUMN IF NOT EXISTS image_url TEXT`).catch(e
 
 const app = express();
 
-app.use(cors({ origin: process.env.CLIENT_URL, credentials: true }));
+const allowedOrigins = (process.env.CLIENT_URL || '').split(',').map(s => s.trim()).filter(Boolean);
+app.use(cors({
+  origin: (origin, cb) => {
+    // Allow same-origin/non-browser requests and any configured client URL
+    if (!origin || allowedOrigins.includes(origin)) return cb(null, true);
+    cb(new Error('CORS blocked'));
+  },
+  credentials: true
+}));
 
 // The Stripe webhook route needs the *raw* body to verify the signature, so it's
 // mounted BEFORE express.json() and given its own raw parser, matched by exact path.
