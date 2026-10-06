@@ -325,7 +325,7 @@
       document.getElementById('noListings').style.display = listings.length ? 'none' : 'block';
       body.innerHTML = listings.map(l => `
         <tr>
-          <td>${l.name}${l.organic ? ' 🌱' : ''}</td>
+          <td>${l.image_url ? `<img src="${l.image_url}" style="width:48px;height:36px;object-fit:cover;border-radius:6px;margin-right:8px;vertical-align:middle;">` : ''}${l.name}${l.organic ? ' 🌱' : ''}</td>
           <td>${l.category}</td>
           <td>$${(l.price_cents/100).toFixed(2)} / ${l.unit}</td>
           <td><span class="status-pill status-${l.status}">${l.status.replace('_',' ')}</span></td>
