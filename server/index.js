@@ -7,11 +7,34 @@ const billingRoutes = require('./routes/billing');
 const listingsRoutes = require('./routes/listings');
 const messagesRoutes = require('./routes/messages');
 const reservationsRoutes = require('./routes/reservations');
+const vouchersRoutes = require('./routes/vouchers');
 const db = require('./db');
 
 // Lightweight startup migration: add columns that may not exist yet.
 db.query(`ALTER TABLE listings ADD COLUMN IF NOT EXISTS image_url TEXT`).catch(e =>
   console.error('Migration warning (image_url):', e.message)
+);
+
+// Voucher system tables
+db.query(`
+  CREATE TABLE IF NOT EXISTS vouchers (
+    id SERIAL PRIMARY KEY,
+    code VARCHAR(50) UNIQUE NOT NULL,
+    plan_type VARCHAR(20) NOT NULL CHECK (plan_type IN ('farmer', 'buyer')),
+    max_uses INTEGER NOT NULL DEFAULT 1,
+    uses_count INTEGER NOT NULL DEFAULT 0,
+    expires_at TIMESTAMPTZ,
+    created_at TIMESTAMPTZ DEFAULT now()
+  );
+  CREATE TABLE IF NOT EXISTS voucher_redemptions (
+    id SERIAL PRIMARY KEY,
+    voucher_id INTEGER NOT NULL REFERENCES vouchers(id),
+    user_id INTEGER NOT NULL,
+    redeemed_at TIMESTAMPTZ DEFAULT now(),
+    UNIQUE(user_id)
+  );
+`).catch(e =>
+  console.error('Migration warning (vouchers):', e.message)
 );
 
 const app = express();
@@ -43,6 +66,7 @@ app.use('/api/billing', billingRoutes);
 app.use('/api/listings', listingsRoutes);
 app.use('/api/messages', messagesRoutes);
 app.use('/api/reservations', reservationsRoutes);
+app.use('/api/vouchers', vouchersRoutes);
 
 // Central error handler — keeps stack traces out of API responses
 app.use((err, req, res, next) => {
