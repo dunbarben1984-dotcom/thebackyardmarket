@@ -120,6 +120,14 @@
         </div>
         <div id="billingActions"></div>
       </div>
+      <div id="voucherSection" style="margin-top:12px;padding-top:12px;border-top:1px solid var(--line);">
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+          <input id="voucherCode" type="text" placeholder="Have a voucher code? Enter it here"
+            style="flex:1;min-width:200px;padding:8px 12px;border:1px solid var(--line);border-radius:var(--radius);font-size:0.9rem;">
+          <button class="btn btn-outline btn-small" onclick="redeemVoucher()">Redeem</button>
+        </div>
+        <p id="voucherMessage" style="font-size:0.85rem;margin-top:6px;"></p>
+      </div>
     </div>
 
     <div class="panel" id="listingsPanel" style="display:none;">
@@ -291,6 +299,33 @@
       const data = await api('/billing/portal', { method:'POST' });
       window.location.href = data.url;
     }catch(err){ alert(err.message); }
+  }
+
+  async function redeemVoucher(){
+    const codeInput = document.getElementById('voucherCode');
+    const msgEl = document.getElementById('voucherMessage');
+    const code = codeInput.value.trim();
+    if (!code){
+      msgEl.textContent = 'Please enter a voucher code.';
+      msgEl.style.color = 'var(--danger, #c0392b)';
+      return;
+    }
+    msgEl.textContent = 'Redeeming...';
+    msgEl.style.color = 'var(--ink-soft)';
+    try{
+      const data = await api('/vouchers/redeem', {
+        method: 'POST',
+        body: JSON.stringify({ code })
+      });
+      msgEl.textContent = data.message || 'Voucher redeemed successfully!';
+      msgEl.style.color = 'var(--success, #27ae60)';
+      codeInput.value = '';
+      // Refresh billing status
+      setTimeout(() => location.reload(), 1500);
+    }catch(err){
+      msgEl.textContent = err.message || 'Failed to redeem voucher.';
+      msgEl.style.color = 'var(--danger, #c0392b)';
+    }
   }
 
   function openNewListingForm(){ document.getElementById('newListingForm').style.display = 'block'; }
