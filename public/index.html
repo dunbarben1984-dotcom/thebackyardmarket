@@ -301,12 +301,14 @@
         <div class="hero-stat"><b>0%</b><span>markup on your price</span></div>
       </div>
     </div>
-    <div class="board">
-      <div class="board-head"><b>Today at the stand</b><span>UPDATED 6:02 AM</span></div>
+    <div class="board" id="standBoard">
+      <div class="board-head"><b>Today at the stand</b><span id="standUpdated">UPDATED 6:02 AM</span></div>
+      <div id="standRows">
       <div class="board-row"><div><span class="item">Heirloom tomatoes</span><span class="tag">Rustling Pines Farm · Organic</span></div><span class="price">$4.50/lb</span></div>
       <div class="board-row"><div><span class="item">Grass-fed ground beef</span><span class="tag">Cedar Hollow Ranch</span></div><span class="price">$9.00/lb</span></div>
       <div class="board-row"><div><span class="item">Farm eggs, dozen</span><span class="tag">Little Bramble Farm · Organic</span></div><span class="price">$6.00</span></div>
       <div class="board-row"><div><span class="item">Wildflower honey, 16oz</span><span class="tag">Old Orchard Apiary</span></div><span class="price">$11.00</span></div>
+      </div>
     </div>
   </div>
 </section>
@@ -483,6 +485,21 @@
         const demo = document.getElementById('demoNotice');
         if (demo) demo.style.display = 'none';
         renderListings();
+        // Wire the hero "Today at the stand" board to the same real listings.
+        const standRows = document.getElementById('standRows');
+        if (standRows) {
+          standRows.innerHTML = realListings.slice(0, 4).map(l => `
+            <div class="board-row"><div><span class="item">${l.name}</span><span class="tag">${l.farm}${l.cat === 'Organic' ? ' · Organic' : ''}</span></div><span class="price">${l.price}</span></div>
+          `).join('');
+          const standUpdated = document.getElementById('standUpdated');
+          if (standUpdated) {
+            const now = new Date();
+            let hh = now.getHours();
+            const ap = hh >= 12 ? 'PM' : 'AM';
+            hh = hh % 12 || 12;
+            standUpdated.textContent = 'UPDATED ' + hh + ':' + String(now.getMinutes()).padStart(2, '0') + ' ' + ap;
+          }
+        }
       }
     })
     .catch(() => {});
