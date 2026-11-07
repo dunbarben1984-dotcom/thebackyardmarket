@@ -40,7 +40,7 @@ db.query(`
 const app = express();
 
 const allowedOrigins = [
-  ...'https://thebackyardmarket.com,https://regal-zuccutto-1b3806.netlify.app'.split(','),
+  ...'https://thebackyardmarket.com'.split(','),
   ...(process.env.CLIENT_URL || '').split(','),
 ].map(s => s.trim()).filter(Boolean);
 app.use(cors({
