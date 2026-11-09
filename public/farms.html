@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="canonical" href="https://thebackyardmarket.com/farms.html">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Local farms — The Backyard Market</title>
+<link rel="icon" type="image/jpeg" href="/logo.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --green-dark:#1F3B2C; --green:#2F5541; --green-pale:#E4EBDF;
+    --gold:#D4A24C; --gold-deep:#B27F2E; --cream:#F7F2E6; --paper:#FCFAF4;
+    --ink:#241C15; --ink-soft:#5B5245; --rust:#B8481F; --line:#DCD3BE; --radius:3px;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--cream);color:var(--ink);font-family:'Work Sans',sans-serif;font-size:16px;line-height:1.5;}
+  h1,h2,h3{font-family:'Fraunces',serif;font-weight:600;line-height:1.08;margin:0;letter-spacing:-0.01em;}
+  a{color:inherit;}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 28px;}
+  header{position:sticky;top:0;z-index:50;background:var(--paper);border-bottom:1px solid var(--line);}
+  .nav{display:flex;align-items:center;justify-content:space-between;padding:16px 28px;max-width:1180px;margin:0 auto;}
+  .logo{display:flex;align-items:center;gap:10px;font-family:'Fraunces',serif;font-weight:700;font-size:1.35rem;color:var(--green-dark);text-decoration:none;}
+  .nav-links{display:flex;gap:28px;align-items:center;}
+  .nav-links a{text-decoration:none;font-size:0.95rem;font-weight:500;color:var(--ink-soft);padding:6px 2px;border-bottom:2px solid transparent;}
+  .nav-links a:hover{color:var(--green-dark);border-color:var(--gold);}
+  .btn{display:inline-block;padding:11px 20px;border-radius:var(--radius);font-weight:600;font-size:0.92rem;border:1px solid transparent;text-decoration:none;cursor:pointer;}
+  .btn-primary{background:var(--green-dark);color:var(--paper);}
+  .btn-primary:hover{background:var(--green);}
+  .btn-outline{background:transparent;border-color:var(--green-dark);color:var(--green-dark);}
+  .btn-small{padding:8px 14px;font-size:0.85rem;}
+  main{padding:48px 0 80px;}
+  .intro{max-width:680px;margin-bottom:32px;}
+  .intro h1{font-size:2.4rem;color:var(--green-dark);}
+  .intro p{color:var(--ink-soft);margin-top:14px;}
+  .county{font-size:1.25rem;color:var(--green-dark);margin:36px 0 14px;padding-bottom:8px;border-bottom:2px solid var(--gold);}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px;}
+  .card{background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:22px;}
+  .card h3{font-size:1.15rem;color:var(--green-dark);}
+  .card .place{font-size:0.85rem;color:var(--ink-soft);margin-top:4px;}
+  .card .products{font-size:0.92rem;margin-top:12px;}
+  .card .products.missing{color:var(--ink-soft);font-style:italic;}
+  .pill{display:inline-block;padding:3px 10px;border-radius:12px;font-size:0.74rem;font-weight:700;background:var(--green-pale);color:var(--green-dark);margin-top:12px;}
+  .card .actions{margin-top:16px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
+  .card .actions a.site{font-size:0.85rem;color:var(--green);}
+  .empty{color:var(--ink-soft);}
+  footer{border-top:1px solid var(--line);padding:28px 0;color:var(--ink-soft);font-size:0.88rem;}
+  @media (max-width:720px){ .nav-links{display:none;} }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="nav">
+    <a class="logo" href="/"><img src="/logo.jpg" alt="The Backyard Market" style="height:44px;width:44px;border-radius:50%;object-fit:cover;">The Backyard Market</a>
+    <nav class="nav-links">
+      <a href="/#browse">Browse</a>
+      <a href="/#how">How it works</a>
+      <a href="/#pricing">Pricing</a>
+      <a href="/farms.html">Farms</a>
+    </nav>
+    <div><a class="btn btn-primary btn-small" href="/dashboard.html?role=farmer">List your farm</a></div>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="intro">
+    <h1>Local farms</h1>
+    <p>Real farms in Union County and nearby — found in public farm directories and
+    listed here so nearby buyers can find them. Profiles marked <b>Unclaimed</b> were
+    added from public listings and aren't run by the farm yet. If this is your farm,
+    claim it — your first 6 months are free as a founding farmer.</p>
+  </div>
+  <div id="farmList"><p class="empty">Loading farms…</p></div>
+</main>
+
+<footer>
+  <div class="wrap">The Backyard Market — fresh food straight from local farms.<br>
+  Farm profiles marked Unclaimed are built from public directory listings; the farm hasn't claimed its page yet.</div>
+</footer>
+
+<script>
+  const API_BASE = window.location.origin.includes('localhost') ? 'http://localhost:4242' : 'https://thebackyardmarket.onrender.com';
+
+  function esc(s){
+    return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+
+  async function loadFarms(){
+    const el = document.getElementById('farmList');
+    try{
+      const res = await fetch(`${API_BASE}/api/seeded-farms`);
+      const farms = await res.json();
+      if (!Array.isArray(farms) || !farms.length){
+        el.innerHTML = '<p class="empty">No farm profiles yet — check back soon.</p>';
+        return;
+      }
+      const byCounty = {};
+      farms.forEach(f => { (byCounty[f.county] = byCounty[f.county] || []).push(f); });
+      el.innerHTML = Object.keys(byCounty).sort().map(county => `
+        <h2 class="county">${esc(county)} County</h2>
+        <div class="grid">
+          ${byCounty[county].map(f => `
+            <div class="card">
+              <h3>${esc(f.farm_name)}</h3>
+              <div class="place">${esc([f.town, f.county ? f.county + ' County' : null, f.zip_code].filter(Boolean).join(', '))}</div>
+              ${f.products
+                ? `<p class="products">${esc(f.products)}</p>`
+                : `<p class="products missing">Products coming soon — the farm will list them when it claims this page.</p>`}
+              <span class="pill">Unclaimed — added from a public directory</span>
+              <div class="actions">
+                <a class="btn btn-primary btn-small" href="/dashboard.html?role=farmer&claim=${esc(f.id)}">Claim this farm</a>
+                ${f.website_url ? `<a class="site" href="${esc(f.website_url)}" target="_blank" rel="noopener">Visit website ↗</a>` : ''}
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      `).join('');
+    }catch(err){
+      el.innerHTML = '<p class="empty">Could not load the farm list right now — please try again later.</p>';
+    }
+  }
+
+  loadFarms();
+</script>
+</body>
+</html>

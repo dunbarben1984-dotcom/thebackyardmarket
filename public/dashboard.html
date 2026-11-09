@@ -75,6 +75,7 @@
 <!-- LOGIN / SIGNUP -->
 <div id="authScreen" class="wrap">
   <div class="panel">
+    <div id="claimBanner" class="banner ok" style="display:none;"></div>
     <div class="tabs">
       <div class="tab active" id="tabLogin" onclick="switchTab('login')">Sign in</div>
       <div class="tab" id="tabSignup" onclick="switchTab('signup')">Create account</div>
@@ -201,6 +202,29 @@
     }
   })();
 
+  // Claim flow (?claim=<seeded farm id> from an outreach email or the Farms
+  // directory): pre-fill the farm name, and after sign-in claim the seeded
+  // profile — first 6 months free as a founding farmer.
+  (function(){
+    const claimId = new URLSearchParams(window.location.search).get('claim');
+    if(!claimId) return;
+    localStorage.setItem('ff_claim', claimId);
+    switchTab('signup');
+    document.getElementById('suRole').value = 'farmer';
+    toggleFarmField();
+    fetch(`${API_BASE}/api/seeded-farms/${claimId}`)
+      .then(r => r.json())
+      .then(f => {
+        if(f && f.farm_name){
+          document.getElementById('suFarmName').value = f.farm_name;
+          const banner = document.getElementById('claimBanner');
+          banner.style.display = 'block';
+          banner.textContent = `You're claiming ${f.farm_name}${f.town ? ' (' + f.town + (f.county ? ', ' + f.county + ' County' : '') + ')' : ''} — create your farmer account below. Your first 6 months are free as a founding farmer, then $29.99/yr.`;
+        }
+      })
+      .catch(() => {});
+  })();
+
   async function api(path, options = {}){
     const res = await fetch(`${API_BASE}/api${path}`, {
       ...options,
@@ -261,6 +285,26 @@
     document.getElementById('authScreen').style.display = 'block';
   }
 
+  // Claim a seeded farm profile saved from a ?claim= link (runs once, after
+  // sign-in — the claim id survives in localStorage across the signup step).
+  async function tryPendingClaim(){
+    const pending = localStorage.getItem('ff_claim');
+    if(!pending || !currentUser || currentUser.role !== 'farmer') return;
+    localStorage.removeItem('ff_claim');
+    const banner = document.getElementById('subBanner');
+    try{
+      const data = await api(`/seeded-farms/${pending}/claim`, { method:'POST' });
+      banner.innerHTML = `<div class="banner ok"><b>${data.claimed}</b> is now your farm page. ${
+        data.foundingGranted
+          ? `Your first 6 months are free — active until ${new Date(data.validUntil).toLocaleDateString()}.`
+          : (data.foundingExhausted
+            ? 'The founding free slots are all taken — set up payment below to activate your listing.'
+            : 'Your farm page is claimed. Set up payment below to activate your listing.')} Add your first listing below to start selling.</div>`;
+    }catch(err){
+      banner.innerHTML = `<div class="banner warn">Couldn't claim that farm page: ${err.message}</div>`;
+    }
+  }
+
   async function boot(){
     if(!token || !currentUser) return;
     document.getElementById('authScreen').style.display = 'none';
@@ -270,6 +314,7 @@
       document.getElementById('listingsPanel').style.display = 'block';
       await loadListings();
     }
+    await tryPendingClaim();
   }
 
   async function loadBilling(){
